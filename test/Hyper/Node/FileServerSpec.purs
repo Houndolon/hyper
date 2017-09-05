@@ -77,3 +77,7 @@ spec =
                                            , Tuple "Content-Length" "144"
                                            ]
         response `bodyShouldContain` "<h1>Test File</h1>"
+
+      it "ignores the query string when serving the exactly matched file" do
+        response <- serveFilesAndGet "some-file.txt?query=string"
+        testStatus response `shouldEqual` Just statusOK
