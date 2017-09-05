@@ -6,6 +6,7 @@ import Node.Path as Path
 import Control.IxMonad (ibind, (:>>=))
 import Control.Monad.Aff.Class (liftAff, class MonadAff)
 import Control.Monad.Eff.Class (liftEff)
+import Data.String (takeWhile)
 import Data.Tuple (Tuple(Tuple))
 import Hyper.Conn (Conn)
 import Hyper.Middleware (Middleware, lift')
@@ -63,10 +64,11 @@ fileServer
      (Conn req (res ResponseEnded) c)
      Unit
 fileServer dir on404 = do
-  conn ← getConn
   { url } <- getRequestData
-  serve (Path.concat [dir, url])
+  serve (Path.concat [dir, fileUrl url])
   where
+    fileUrl url = takeWhile (_ /= '?') url
+
     serveStats absolutePath stats
       | isFile stats = serveFile absolutePath
       | isDirectory stats = serve (Path.concat [absolutePath, "index.html"])
